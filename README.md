@@ -142,7 +142,7 @@ Feel free to clone, use in adherance to the [license](#license) and perhaps send
 
 ``` bash
 git clone https://github.com/miraclx/libeaes-js.git
-cd stringd
+cd libeaes-js
 npm install
 # hack on code
 npm run build
