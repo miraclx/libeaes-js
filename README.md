@@ -141,7 +141,7 @@ Read the file, decrypt and decompress each chunk, write to the outfile
 Feel free to clone, use in adherance to the [license](#license) and perhaps send pull requests
 
 ``` bash
-git clone https://github.com/miraclx/libeaes:js.git
+git clone https://github.com/miraclx/libeaes-js.git
 cd stringd
 npm install
 # hack on code

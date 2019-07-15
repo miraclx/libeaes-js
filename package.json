@@ -34,10 +34,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:miraclx/libeaes:js.git"
+    "url": "git@github.com:miraclx/libeaes-js.git"
   },
   "bugs": {
-    "url": "https://github.com/miraclx/libeaes:js/issues"
+    "url": "https://github.com/miraclx/libeaes-js/issues"
   },
   "license": "Apache-2.0",
   "babel": {
@@ -71,7 +71,7 @@
   "dependencies": {
     "core-js": "^2.6.5"
   },
-  "homepage": "https://github.com/miraclx/libeaes:js#readme",
+  "homepage": "https://github.com/miraclx/libeaes-js#readme",
   "directories": {
     "lib": "lib",
     "test": "test"
