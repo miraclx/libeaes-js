@@ -1,0 +1,79 @@
+{
+  "name": "libeaes",
+  "version": "0.5.0",
+  "description": "Enhanced simultaneous compression + encryption prototype with NodeJS",
+  "main": "dist/index.js",
+  "types": "typings/index.d.ts",
+  "scripts": {
+    "push": "git push github master",
+    "build": "babel lib -sd dist",
+    "version": "npm run build",
+    "postversion": "npm run push"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "files": [
+    "dist",
+    "typings"
+  ],
+  "keywords": [
+    "eaes",
+    "aes",
+    "crypto",
+    "gzip",
+    "zlib",
+    "compress",
+    "decompress",
+    "encrypt",
+    "decrypt"
+  ],
+  "authors": "Miraculous Owonubi <omiraculous@gmail.com>",
+  "maintainers": [
+    "Miraculous Owonubi <omiraculous@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:miraclx/libeaes:js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/miraclx/libeaes:js/issues"
+  },
+  "license": "Apache-2.0",
+  "babel": {
+    "presets": [
+      "airbnb",
+      [
+        "@babel/preset-env",
+        {
+          "corejs": 2,
+          "useBuiltIns": "usage",
+          "targets": {
+            "node": 4
+          }
+        }
+      ]
+    ]
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-eslint": "^10.0.1",
+    "babel-preset-airbnb": "^3.2.1",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-import": "^2.17.2",
+    "eslint-plugin-prettier": "^3.0.1",
+    "prettier": "^1.17.0"
+  },
+  "dependencies": {
+    "core-js": "^2.6.5"
+  },
+  "homepage": "https://github.com/miraclx/libeaes:js#readme",
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
+}
