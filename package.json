@@ -28,7 +28,10 @@
     "encrypt",
     "decrypt"
   ],
-  "authors": "Miraculous Owonubi <omiraculous@gmail.com>",
+  "authors": [
+    "Miraculous Owonubi <omiraculous@gmail.com>",
+    "Samuel Adenle <adenles@run.edu.ng>"
+  ],
   "maintainers": [
     "Miraculous Owonubi <omiraculous@gmail.com>"
   ],
