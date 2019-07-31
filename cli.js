@@ -21,10 +21,15 @@ function buildProgress(size, infile, outfile, label) {
   const progressStream = ProgressBar.stream(size, {
     template: [
       ':{label} :{flipper}',
-      ' \x1b[32m\u2022\x1b[0m [:{infile}] -> [:{outfile}]',
-      ' [:{bar}] [:3{percentage}%] (:{eta}) [:{size}/:{size:total}]',
+      ' | :{bullet} [:{infile}] -> [:{outfile}]',
+      ' | [:{bar}] [:3{percentage}%] (:{eta}) [:{size}/:{size:total}]',
     ],
-    variables: {infile, outfile},
+    variables: {
+      infile,
+      outfile,
+      bullet: '\u2022',
+    },
+    flipper: [...Array(10)].map((...[, i]) => `:{color:random}${':{bullet}'.repeat(i + 1)}:{color:close}`),
     label,
   });
   const {bar} = progressStream;
@@ -39,7 +44,18 @@ function getFinalListener(msg, i, o, bar) {
     let delta = ((outputSize - inputSize) / inputSize) * 100;
     const direction = delta < 0 ? 'Deflation' : delta > 0 ? 'Inflation' : 'Static';
     delta = Math.abs(delta).toFixed(2);
-    bar.end(`${msg}\n ${`\u2022 Runtime: ${(new Date() - startTime) / 1000}s`}\n ${`\u2022 ${direction} %: ${delta}%`} \n`);
+    bar.end(
+      [
+        ` ${msg}`,
+        `  \u2022 Runtime     : ${(new Date() - startTime) / 1000}s`,
+        `  \u2022 Input File  : [${i}]`,
+        `  \u2022 Output File : [${o}]`,
+        `  \u2022 Input Size  : ${xbytes(inputSize)}`,
+        `  \u2022 Output Size : ${xbytes(outputSize)}`,
+        `  \u2022 ${direction}   : ${delta}%`,
+        '',
+      ].join('\n'),
+    );
   };
 }
 
@@ -53,7 +69,7 @@ function processEncrypt(infile, outfile, args) {
     const encryptor = new EAESEncryptor(password);
     const infileStream = fs.createReadStream(infile);
     const outfileStream = fs.createWriteStream(outfile);
-    const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Encrypting...');
+    const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Encrypting');
     infileStream
       .pipe(progressStream.next())
       .pipe(encryptor)
@@ -67,7 +83,6 @@ function processEncrypt(infile, outfile, args) {
 }
 
 function processDecrypt(infile, outfile, args) {
-  const STARTTIME = new Date();
   if (!fs.existsSync(infile)) throw Error('The specified input file is unexistent');
   if (fs.existsSync(outfile) && !args.force) throw Error('The output file already exists!, to force overwrite use the `-f` flag');
   const inputstat = fs.statSync(infile);
@@ -77,7 +92,7 @@ function processDecrypt(infile, outfile, args) {
     const decryptor = new EAESDecryptor(password);
     const infileStream = fs.createReadStream(infile);
     const outfileStream = fs.createWriteStream(outfile);
-    const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Decrypting...');
+    const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Decrypting');
     infileStream
       .pipe(progressStream.next())
       .pipe(decryptor)
