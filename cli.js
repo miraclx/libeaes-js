@@ -60,10 +60,11 @@ function getFinalListener(msg, i, o, bar) {
 }
 
 function processEncrypt(infile, outfile, args) {
-  if (!fs.existsSync(infile)) throw Error('The specified input file is unexistent');
-  if (fs.existsSync(outfile) && !args.force) throw Error('The output file already exists!, to force overwrite use the `-f` flag');
+  if (!fs.existsSync(infile)) console.error('\x1b[31[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
+  if (fs.existsSync(outfile) && !args.force)
+    console.error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
   const inputstat = fs.statSync(infile);
-  if (!inputstat.isFile()) throw Error(`The specified input file [${infile}] is not a file`);
+  if (!inputstat.isFile()) console.error(`\x1b[31[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
 
   function doEncrypt(password) {
     const encryptor = new EAESEncryptor(password);
@@ -83,10 +84,11 @@ function processEncrypt(infile, outfile, args) {
 }
 
 function processDecrypt(infile, outfile, args) {
-  if (!fs.existsSync(infile)) throw Error('The specified input file is unexistent');
-  if (fs.existsSync(outfile) && !args.force) throw Error('The output file already exists!, to force overwrite use the `-f` flag');
+  if (!fs.existsSync(infile)) console.error('\x1b[31[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
+  if (fs.existsSync(outfile) && !args.force)
+    console.error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
   const inputstat = fs.statSync(infile);
-  if (!inputstat.isFile()) throw Error(`The specified input file [${infile}] is not a file`);
+  if (!inputstat.isFile()) console.error(`\x1b[31[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
 
   function doDecrypt(password) {
     const decryptor = new EAESDecryptor(password);
