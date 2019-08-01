@@ -63,6 +63,16 @@ function getFinalListener(msg, i, o, bar) {
   };
 }
 
+function wrapError(bar, msg) {
+  return err =>
+    bar.end(
+      `\x1b[31m[!]\x1b[0m ${msg}\n${`${err}`
+        .split('\n')
+        .map(v => ` \x1b[36m\u2022\x1b[0m ${v}`)
+        .join('\n')}\n`,
+    );
+}
+
 function processEncrypt(infile, outfile, args) {
   if (!fs.existsSync(infile)) console.error('\x1b[31m[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
   if (fs.existsSync(outfile) && !args.force)
@@ -79,8 +89,8 @@ function processEncrypt(infile, outfile, args) {
     const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Encrypting');
     infileStream
       .pipe(progressStream.next())
-      .pipe(zlib.createGzip())
-      .pipe(cipher)
+      .pipe(zlib.createGzip().on('error', wrapError(bar, 'An error occurred while compressing')))
+      .pipe(cipher.on('error', wrapError(bar, 'An error occurred while encrypting')))
       .pipe(
         new stream.Transform({
           transform(v, e, c) {
@@ -125,8 +135,8 @@ function processDecrypt(infile, outfile, args) {
       const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Decrypting');
       infileStream
         .pipe(progressStream.next())
-        .pipe(decipher)
-        .pipe(zlib.createGunzip())
+        .pipe(decipher.on('error', wrapError(bar, 'An error occurred while decrypting')))
+        .pipe(zlib.createGunzip().on('error', wrapError(bar, 'An error occurred while decompressing')))
         .pipe(outfileStream)
         .on('finish', getFinalListener('Decryption Complete!', infile, outfile, bar));
     });
