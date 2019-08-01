@@ -1,7 +1,7 @@
 {
   "name": "libeaes",
   "version": "0.5.1",
-  "description": "Enhanced simultaneous compression + encryption prototype with NodeJS",
+  "description": "Enhanced simultaneous compression + encryption with NodeJS",
   "main": "dist/index.js",
   "types": "typings/index.d.ts",
   "scripts": {
