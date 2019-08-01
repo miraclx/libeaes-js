@@ -1,12 +1,14 @@
 #!node
 
 const fs = require('fs');
+const zlib = require('zlib');
+const stream = require('stream');
 const xbytes = require('xbytes');
 const commander = require('commander');
 const ProgressBar = require('xprogress');
 const ninjaQuery = require('ninja_query');
 const packageJson = require('./package.json');
-const {EAESEncryptor, EAESDecryptor} = require('.');
+const {newCipherConstruct, newDecipherConstruct, extractCoordsFromHeader} = require('.');
 
 function passwordQuery(query, confirm = true) {
   return ninjaQuery.password(
@@ -70,13 +72,33 @@ function processEncrypt(infile, outfile, args) {
     console.error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
 
   function doEncrypt(password) {
-    const encryptor = new EAESEncryptor(password);
+    // const encryptor = new EAESEncryptor(password);
+    const cipher = newCipherConstruct(password).on('error', console.log);
     const infileStream = fs.createReadStream(infile);
     const outfileStream = fs.createWriteStream(outfile);
     const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Encrypting');
     infileStream
       .pipe(progressStream.next())
-      .pipe(encryptor)
+      .pipe(zlib.createGzip())
+      .pipe(cipher)
+      .pipe(
+        new stream.Transform({
+          transform(v, e, c) {
+            this.overflow = this.overflow || Buffer.alloc(0);
+            if (!this.hasWrittenHeader) {
+              v = Buffer.concat([cipher.hash, v]);
+              this.hasWrittenHeader = true;
+            }
+            v = Buffer.concat([this.overflow, v]);
+            this.overflow = v.slice(this.readableHighWaterMark, Infinity);
+            v = v.slice(0, this.readableHighWaterMark);
+            c(null, v);
+          },
+          flush(cb) {
+            cb(null, this.overflow);
+          },
+        }),
+      )
       .pipe(outfileStream)
       .on('finish', getFinalListener('Encryption Complete!', infile, outfile, bar));
   }
@@ -95,15 +117,19 @@ function processDecrypt(infile, outfile, args) {
     console.error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
 
   function doDecrypt(password) {
-    const decryptor = new EAESDecryptor(password);
-    const infileStream = fs.createReadStream(infile);
-    const outfileStream = fs.createWriteStream(outfile);
-    const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Decrypting');
-    infileStream
-      .pipe(progressStream.next())
-      .pipe(decryptor)
-      .pipe(outfileStream)
-      .on('finish', getFinalListener('Decryption Complete!', infile, outfile, bar));
+    // const decryptor = new EAESDecryptor(password);
+    fs.createReadStream(infile, {start: 0, end: 0x30}).on('data', HEADER => {
+      const decipher = newDecipherConstruct(extractCoordsFromHeader(HEADER), password);
+      const infileStream = fs.createReadStream(infile, {start: 0x30});
+      const outfileStream = fs.createWriteStream(outfile);
+      const {bar, progressStream} = buildProgress(inputstat.size, infile, outfile, 'Decrypting');
+      infileStream
+        .pipe(progressStream.next())
+        .pipe(decipher)
+        .pipe(zlib.createGunzip())
+        .pipe(outfileStream)
+        .on('finish', getFinalListener('Decryption Complete!', infile, outfile, bar));
+    });
   }
 
   args.key
