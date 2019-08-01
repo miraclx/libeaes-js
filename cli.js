@@ -1,3 +1,5 @@
+#!node
+
 const fs = require('fs');
 const xbytes = require('xbytes');
 const commander = require('commander');

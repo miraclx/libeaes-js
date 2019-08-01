@@ -10,6 +10,9 @@
     "version": "npm run build",
     "postversion": "npm run push"
   },
+  "bin": {
+    "libeaes": "cli.js"
+  },
   "engines": {
     "node": ">=4"
   },
