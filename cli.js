@@ -61,14 +61,17 @@ function getFinalListener(msg, i, o, bar) {
   };
 }
 
-function wrapError(bar, msg) {
-  return err =>
+function wrapError(bar, outfile, msg) {
+  return err => {
     bar.end(
       `\x1b[31m[!]\x1b[0m ${msg}\n${`${err}`
         .split('\n')
         .map(v => ` \x1b[36m\u2022\x1b[0m ${v}`)
         .join('\n')}\n`,
     );
+    process.stdout.write(`\x1b[33m[i]\x1b[0m Removing incomplete output file ${outfile}...`);
+    fs.unlink(outfile, _err => console.log(_err ? '\x1b[31mfailed\x1b[0m' : '\x1b[32mdone\x1b[0m'));
+  };
 }
 
 function processEncrypt(infile, outfile, args) {
@@ -86,7 +89,7 @@ function processEncrypt(infile, outfile, args) {
     const {bar, progressStream} = buildProgress(infile, outfile, 'Encrypting');
     infileStream
       .pipe(progressStream.next())
-      .pipe(encryptor.on('error', wrapError(bar, 'An error occurred while encrypting')))
+      .pipe(encryptor.on('error', wrapError(bar, outfile, 'An error occurred while encrypting')))
       .pipe(outfileStream)
       .on('finish', getFinalListener('Encryption Complete!', infile, outfile, bar));
   }
@@ -111,7 +114,7 @@ function processDecrypt(infile, outfile, args) {
     const {bar, progressStream} = buildProgress(infile, outfile, 'Decrypting');
     infileStream
       .pipe(progressStream.next())
-      .pipe(decryptor.on('error', wrapError(bar, 'An error occurred while decrypting')))
+      .pipe(decryptor.on('error', wrapError(bar, outfile, 'An error occurred while decrypting')))
       .pipe(outfileStream)
       .on('finish', getFinalListener('Decryption Complete!', infile, outfile, bar));
   }
