@@ -121,7 +121,7 @@ function processDecrypt(infile, outfile, args) {
     : passwordQuery('Please enter the password for decrypting :', false).then(({password}) => doDecrypt(password));
 }
 
-commander.usage('[[<command>] [<content> [<options>]]] [-h]');
+commander.usage('[[<command>] [<content> [<options>]]] [-h] [-v]').version(`v${packageJson.version}`, '-v, --version');
 
 commander
   .command('encrypt <file> <output>')
@@ -139,12 +139,14 @@ commander
   .action(processDecrypt);
 
 function main(argv) {
-  console.log(`lib-EAES Version ${packageJson.version}`);
-  console.log('=========================================================================================');
-  console.log('\u2022', packageJson.description);
-  console.log('\u2022', `Authors: ${packageJson.authors.join(', ')}`);
-  console.log('=========================================================================================');
-  if (!argv.slice(2).length) commander.outputHelp();
+  if (!argv.includes('-v')) {
+    console.log(`lib-EAES Version ${packageJson.version}`);
+    console.log('=========================================================================================');
+    console.log('\u2022', packageJson.description);
+    console.log('\u2022', `Authors: ${packageJson.authors.join(', ')}`);
+    console.log('=========================================================================================');
+    if (!argv.slice(2).filter(v => v !== '-').length) commander.outputHelp();
+  }
   commander.parse(argv);
 }
 
