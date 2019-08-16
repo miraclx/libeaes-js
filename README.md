@@ -40,15 +40,15 @@ let decrypted = libeaes.decrypt(encrypted, password);
 ### Stream Operation
 
 ``` javascript
-// Encrypt
+// Encrypt a stream, pipe output elsewhere
 let encryptor = libeaes.EAESEncryptor("#P@$$W0R9");
 inputStream.pipe(encryptor).pipe(outputStream);
 
-// Decrypt stream
+// Decrypt a stream, pipe output elsewhere
 let decryptor = libeaes.EAESDecryptor("#P@$$W0R9");
 inputStream.pipe(decryptor).pipe(outputStream);
 
-// Both
+// Stream sequential encryption and decryption operations
 let encryptor = libeaes.EAESEncryptor("#P@$$W0R9");
 let decryptor = libeaes.EAESDecryptor("#P@$$W0R9");
 
@@ -82,21 +82,26 @@ Compress + Encrypt the input data, return the processed data
 
 Decrypt + Decompress the input data, return the processed data
 
-### libeaes.rawencrypt(data, key)
+### libeaes.rawencrypt(data, key) *_Excluding compression_
 
 * `data`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * `key`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * Returns: [&lt;Buffer&gt;][buffer]
 
-Encrypt the input data, return the processed data
+Encrypt the input data, return the processed data.
 
-### libeaes.rawdecrypt(data, key)
+Input data is encrypted without initial compression.
+
+
+### libeaes.rawdecrypt(data, key) *_Excluding decompression_
 
 * `data`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * `key`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * Returns: [&lt;Buffer&gt;][buffer]
 
-Decrypt the input data, return the processed data
+Decrypt raw input data, return the processed data.
+
+Input data is assumed to be uncompressed.
 
 ### Class: EAESEncryptor(key[, opts])
 
