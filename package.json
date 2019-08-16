@@ -79,7 +79,7 @@
     "core-js": "^2.6.5",
     "ninja_query": "^0.3.3",
     "xbytes": "^1.3.2",
-    "xprogress": "^0.9.6"
+    "xprogress": "^0.9.9"
   },
   "homepage": "https://github.com/miraclx/libeaes-js#readme",
   "directories": {
