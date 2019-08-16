@@ -89,7 +89,11 @@ function processEncrypt(infile, outfile, args) {
     const {bar, progressStream} = buildProgress(infile, outfile, 'Encrypting');
     infileStream
       .pipe(progressStream.next())
-      .pipe(encryptor.on('error', wrapError(bar, outfile, 'An error occurred while encrypting')))
+      .pipe(
+        encryptor
+          .on('error:encryptor', wrapError(bar, outfile, 'An error occurred while encrypting'))
+          .on('error:compressor', wrapError(bar, outfile, 'An error occurred while compressing')),
+      )
       .pipe(outfileStream)
       .on('finish', getFinalListener('Encryption Complete!', infile, outfile, bar));
   }
@@ -114,7 +118,11 @@ function processDecrypt(infile, outfile, args) {
     const {bar, progressStream} = buildProgress(infile, outfile, 'Decrypting');
     infileStream
       .pipe(progressStream.next())
-      .pipe(decryptor.on('error', wrapError(bar, outfile, 'An error occurred while decrypting')))
+      .pipe(
+        decryptor
+          .on('error:decryptor', wrapError(bar, outfile, 'An error occurred while decrypting'))
+          .on('error:decompressor', wrapError(bar, outfile, 'An error occurred while decompressing')),
+      )
       .pipe(outfileStream)
       .on('finish', getFinalListener('Decryption Complete!', infile, outfile, bar));
   }
