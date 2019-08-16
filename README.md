@@ -103,14 +103,46 @@ Decrypt raw input data, return the processed data.
 
 Input data is assumed to be uncompressed.
 
-### Class: EAESEncryptor(key[, opts])
+### Class: EAESEncryptor(key[, opts]) <sub>extends</sub> [`zlib.Gunzip`][gzip]
 
 * `key`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
-* `opts`: &lt;object&lt
-* Returns: [&lt;Buffer&gt;][buffer]
+* `opts`: [&lt;zlib options&gt;](https://nodejs.org/api/zlib.html#zlib_class_options)
 
-Create an Transforming EAES Encryptor
-The opts object is passed into stream.[Transform][transform]
+Create a Transforming EAES Encryptor.
+
+Data piped in here is compressed and encryped with the `key` configuration.
+
+EAES Streams are encrypted, compressed streams that are tailored to [the algorithm](lib/index.js) in this repo.
+
+The `opts` object are passed directly into [zlib.Gzip][gzip]
+
+#### Event: `'error'`
+
+* `err`: [&lt;Error&gt;][error]
+* `code`: [&lt;number&gt;][number]
+
+This is emitted by either the compression or encryption process.
+
+`code` is `1` when emitted by the encryption engine and [`undefined`][undefined] otherwise.
+
+Catch errors explicitly with the `'error:compressor'` and `'error:encryptor'` events.
+
+#### Event: `'error:encryptor'`
+
+* `err`: [&lt;Error&gt;][error]
+
+The `'error:encryptor'` event is emitted if an error occurred while encrypting compressed data. The listener callback is passed a single `Error` argument when called.
+
+The stream is not closed when the `'error:encryptor'` event is emitted.
+
+#### Event: `'error:compressor'`
+
+* `err`: [&lt;Error&gt;][error]
+
+The `'error:compressor'` event is emitted if an error occurred while encrypting raw data. The listener callback is passed a single `Error` argument when called.
+
+The stream is not closed when the `'error:compressor'` event is emitted.
+
 
 ### Class: EAESDecryptor(key[, opts])
 
