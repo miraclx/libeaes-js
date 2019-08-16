@@ -191,7 +191,9 @@ The stream is not closed when the `'error:decompressor'` event is emitted.
 * `key`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * Returns: [&lt;fs.WriteStream&gt;](https://nodejs.org/api/fs.html#fs_class_fs_writestream)
 
-Read the file, compress and encrypt each chunk, write to the outfile
+Read the file, compress and encrypt each chunk, write to the outfile.
+
+Returns the `outputfile`'s stream object.
 
 ### libeaes.decryptFileStream(infile, outfile, key)
 
@@ -200,7 +202,9 @@ Read the file, compress and encrypt each chunk, write to the outfile
 * `key`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * Returns: [&lt;fs.WriteStream&gt;](https://nodejs.org/api/fs.html#fs_class_fs_writestream)
 
-Read the file, decrypt and decompress each chunk, write to the outfile
+Read the file, decrypt and decompress each chunk, write to the outfile.
+
+Returns the `outputfile`'s stream object.
 
 ## Development
 
@@ -247,5 +251,10 @@ npm test
 
 [url]: https://nodejs.org/api/url.html#url_the_whatwg_url_api
 [buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type
-[transform]: https://nodejs.org/api/stream.html#stream_class_stream_transform
+[undefined]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Undefined_type
+[gzip]: https://nodejs.org/api/zlib.html#zlib_class_zlib_gzip
+[gunzip]: https://nodejs.org/api/zlib.html#zlib_class_zlib_gunzip
+[error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
+[object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
