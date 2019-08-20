@@ -15,7 +15,41 @@ Via [NPM][npm]:
 npm install libeaes
 ```
 
+This installs a CLI binary accessible with the `libeaes` command.
+
+``` bash
+# Check if libeaes command has been installed and accessible on your path
+$ libeaes -v
+v1.2.0
+```
+
 ## Usage
+
+### CLI
+
+The `libeaes` command, using the algorithm, can perfectly process anything thrown at it. No matter the size. And give useful statistics at the end.
+
+``` bash
+$ libeaes encrypt file.txt outputfile.enc
+$ libeaes decrypt outputfile.enc outputfile.dec
+```
+
+Use `--help` to see full usage documentation.
+Use `--help` on specific commands to see docmentation for that command.
+
+``` bash
+$ libeaes encrypt --help
+$ libeaes decrypt --help
+```
+
+The commands can also be shortened to `enc` and `dec` respectfully.
+
+``` bash
+$ libeaes enc file.txt output.enc
+$ libeaes dec output.enc output.dec
+```
+
+### Programmatically
 
 ``` javascript
 // Node CommonJS
