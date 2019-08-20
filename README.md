@@ -103,7 +103,7 @@ Decrypt raw input data, return the processed data.
 
 Input data is assumed to be uncompressed.
 
-### Class: EAESEncryptor(key[, opts]) <sub>extends</sub> [`zlib.Gunzip`][gzip]
+### Class: EAESEncryptor(key[, opts]) <sub>extends</sub> [`zlib.Gzip`][gzip]
 
 * `key`: [&lt;string&gt;][string] | [&lt;Buffer&gt;][buffer]
 * `opts`: [&lt;zlib options&gt;](https://nodejs.org/api/zlib.html#zlib_class_options)
