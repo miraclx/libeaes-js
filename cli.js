@@ -1,4 +1,4 @@
-#!node
+#!/usr/bin/env node
 
 const fs = require('fs');
 const xbytes = require('xbytes');
