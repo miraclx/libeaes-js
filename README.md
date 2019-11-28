@@ -245,6 +245,16 @@ Read the file, decrypt and decompress each chunk, write to the outfile.
 
 Returns the `outputfile`'s stream object.
 
+## ClI Info
+
+* When using pipes, it's not possible to seek through the stream
+* To avoid the terminal being cluttered while using pipes, direct other chained binaries (`stdout`, `stderr`) to `/dev/null`
+
+``` bash
+# Watching from an encrypted movie, hiding vlc's log information
+$ libeaes dec movie.enc | vlc - > /dev/null 2>&1
+```
+
 ## Development
 
 ### Building
