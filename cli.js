@@ -95,6 +95,8 @@ function processEncrypt(infile, outfile, args) {
     error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
   const inputstat = fs.statSync(infile);
   if (!inputstat.isFile()) error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
+  if (!outfile && process.stdout.isTTY)
+    error(`\x1b[31m[!]\x1b[0m No output was specified. Try defining an output file or piping the output.`), process.exit(1);
 
   function doEncrypt(password) {
     const encryptor = new EAESEncryptor(password);
@@ -123,6 +125,8 @@ function processDecrypt(infile, outfile, args) {
     error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
   const inputstat = fs.statSync(infile);
   if (!inputstat.isFile()) error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
+  if (!outfile && process.stdout.isTTY)
+    error(`\x1b[31m[!]\x1b[0m No output was specified. Try defining an output file or piping the output.`), process.exit(1);
 
   function doDecrypt(password) {
     const decryptor = new EAESDecryptor(password);
