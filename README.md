@@ -32,6 +32,11 @@ The `libeaes` command, using the algorithm, can perfectly process anything throw
 ``` bash
 $ libeaes encrypt file.txt outputfile.enc
 $ libeaes decrypt outputfile.enc outputfile.dec
+
+# Piping output
+$ libeaes encrypt movie.mp4 > movie.enc
+# Stream an encrypted file in real time (e.g Watching the movie)
+$ libeaes decrypt movie.enc | vlc -
 ```
 
 Use `--help` to see full usage documentation.
