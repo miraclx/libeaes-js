@@ -3,6 +3,7 @@
 const fs = require('fs');
 const tty = require('tty');
 const util = require('util');
+const stream = require('stream');
 const xbytes = require('xbytes');
 const commander = require('commander');
 const ProgressBar = require('xprogress');
@@ -42,7 +43,7 @@ function buildProgress(infile, outfile, label) {
     ],
     variables: {
       infile,
-      outfile,
+      outfile: outfile || '<stdout>',
       bullet: '\u2022',
     },
     flipper: [...Array(10)].map((...[, i]) => `:{color:random}${':{bullet}'.repeat(i + 1)}:{color:close}`),
@@ -52,11 +53,11 @@ function buildProgress(infile, outfile, label) {
   return {bar, progressStream};
 }
 
-function getFinalListener(msg, i, o, bar) {
+function getFinalListener(msg, i, oStream, bar) {
   const startTime = new Date();
   return () => {
     const {size: inputSize} = fs.statSync(i);
-    const {size: outputSize} = fs.statSync(o);
+    const outputSize = oStream.length;
     let delta = ((outputSize - inputSize) / inputSize) * 100;
     const direction = delta < 0 ? 'Deflation' : delta > 0 ? 'Inflation' : 'Static';
     delta = Math.abs(delta).toFixed(2);
@@ -65,7 +66,7 @@ function getFinalListener(msg, i, o, bar) {
         ` ${msg}`,
         `  \u2022 Runtime     : ${(new Date() - startTime) / 1000}s`,
         `  \u2022 Input File  : [${i}]`,
-        `  \u2022 Output File : [${o}]`,
+        `  \u2022 Output File : [${oStream.outfile || '<stdout>'}]`,
         `  \u2022 Input Size  : ${xbytes(inputSize)}`,
         `  \u2022 Output Size : ${xbytes(outputSize)}`,
         `  \u2022 ${direction}   : ${delta}%`,
@@ -89,6 +90,19 @@ function wrapError(bar, outfile, msg) {
   };
 }
 
+function wrapOutFile(outfile) {
+  const outFileStream = outfile ? fs.createWriteStream(outfile) : process.stdout;
+  const streamWrapper = new stream.Writable({
+    write(v, e, c) {
+      this.length = (this.length || 0) + v.length;
+      outFileStream.write(v, e, c);
+    },
+  });
+  streamWrapper.outfile = outfile;
+  streamWrapper.coreFileStream = outFileStream;
+  return streamWrapper;
+}
+
 function processEncrypt(infile, outfile, args) {
   if (!fs.existsSync(infile)) error('\x1b[31m[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
   if (fs.existsSync(outfile) && !args.force)
@@ -101,7 +115,7 @@ function processEncrypt(infile, outfile, args) {
   function doEncrypt(password) {
     const encryptor = new EAESEncryptor(password);
     const infileStream = fs.createReadStream(infile);
-    const outfileStream = fs.createWriteStream(outfile);
+    const outfileStream = wrapOutFile(outfile);
     const {bar, progressStream} = buildProgress(infile, outfile, 'Encrypting');
     infileStream
       .pipe(progressStream.next())
@@ -111,7 +125,7 @@ function processEncrypt(infile, outfile, args) {
           .on('error:compressor', wrapError(bar, outfile, 'An error occurred while compressing')),
       )
       .pipe(outfileStream)
-      .on('finish', getFinalListener('Encryption Complete!', infile, outfile, bar));
+      .on('finish', getFinalListener('Encryption Complete!', infile, outfileStream, bar));
   }
 
   args.key
@@ -131,7 +145,7 @@ function processDecrypt(infile, outfile, args) {
   function doDecrypt(password) {
     const decryptor = new EAESDecryptor(password);
     const infileStream = fs.createReadStream(infile);
-    const outfileStream = fs.createWriteStream(outfile);
+    const outfileStream = wrapOutFile(outfile);
     const {bar, progressStream} = buildProgress(infile, outfile, 'Decrypting');
     infileStream
       .pipe(progressStream.next())
@@ -141,7 +155,7 @@ function processDecrypt(infile, outfile, args) {
           .on('error:decompressor', wrapError(bar, outfile, 'An error occurred while decompressing')),
       )
       .pipe(outfileStream)
-      .on('finish', getFinalListener('Decryption Complete!', infile, outfile, bar));
+      .on('finish', getFinalListener('Decryption Complete!', infile, outfileStream, bar));
   }
 
   args.key
@@ -152,14 +166,14 @@ function processDecrypt(infile, outfile, args) {
 commander.usage('[[<command>] [<content> [<options>]]] [-h] [-v]').version(`v${packageJson.version}`, '-v, --version');
 
 commander
-  .command('encrypt <file> <output>')
+  .command('encrypt <file> [output]')
   .alias('enc')
   .description('Use the EAES Algorithm to encrypt a specified file')
   .option('-f, --force', 'Explicitly force overwrite of output file (if existent)')
   .option('-k, --key <password>', 'Password to be used in the operation')
   .action(processEncrypt);
 commander
-  .command('decrypt <file> <output>')
+  .command('decrypt <file> [output]')
   .alias('dec')
   .description('Use the EAES Algorithm to decrypt an encrypted file')
   .option('-f, --force', 'Explicitly force overwrite of output file (if existent)')
