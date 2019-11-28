@@ -1,12 +1,26 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
+const tty = require('tty');
+const util = require('util');
 const xbytes = require('xbytes');
 const commander = require('commander');
 const ProgressBar = require('xprogress');
 const ninjaQuery = require('ninja_query');
 const packageJson = require('./package.json');
 const {EAESEncryptor, EAESDecryptor} = require('.');
+
+const [log, error] = [, ,].fill(
+  (function ninjaLoggers() {
+    let output;
+    if (!process.stdout.isTTY && ['linux', 'android', 'darwin'].includes(process.platform))
+      (output = new tty.WriteStream(fs.openSync('/dev/tty', 'w'))), process.on('beforeExit', () => output.destroy());
+    else output = process.stdout;
+    return function ninjaLogger(...args) {
+      output.write(`${util.format(...args)}\n`);
+    };
+  })(),
+);
 
 function passwordQuery(query, confirm = true) {
   return ninjaQuery.password(
@@ -69,18 +83,18 @@ function wrapError(bar, outfile, msg) {
         .map(v => ` \x1b[36m\u2022\x1b[0m ${v}`)
         .join('\n')}\n`,
     );
-    process.stdout.write(`\x1b[33m[i]\x1b[0m Removing incomplete output file ${outfile}...`);
-    fs.unlink(outfile, _err => console.log(_err ? '\x1b[31mfailed\x1b[0m' : '\x1b[32mdone\x1b[0m'));
+    if (outfile)
+      process.stdout.write(`\x1b[33m[i]\x1b[0m Removing incomplete output file ${outfile}...`),
+        fs.unlink(outfile, _err => log(_err ? '\x1b[31mfailed\x1b[0m' : '\x1b[32mdone\x1b[0m'));
   };
 }
 
 function processEncrypt(infile, outfile, args) {
-  if (!fs.existsSync(infile)) console.error('\x1b[31m[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
+  if (!fs.existsSync(infile)) error('\x1b[31m[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
   if (fs.existsSync(outfile) && !args.force)
-    console.error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
+    error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
   const inputstat = fs.statSync(infile);
-  if (!inputstat.isFile())
-    console.error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
+  if (!inputstat.isFile()) error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
 
   function doEncrypt(password) {
     const encryptor = new EAESEncryptor(password);
@@ -104,12 +118,11 @@ function processEncrypt(infile, outfile, args) {
 }
 
 function processDecrypt(infile, outfile, args) {
-  if (!fs.existsSync(infile)) console.error('\x1b[31m[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
+  if (!fs.existsSync(infile)) error('\x1b[31m[!]\x1b[0m The specified input file is unexistent'), process.exit(1);
   if (fs.existsSync(outfile) && !args.force)
-    console.error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
+    error('\x1b[33m[!]\x1b[0m The output file already exists!, to force overwrite use the `-f` flag'), process.exit(1);
   const inputstat = fs.statSync(infile);
-  if (!inputstat.isFile())
-    console.error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
+  if (!inputstat.isFile()) error(`\x1b[31m[!]\x1b[0m The specified input file [${infile}] is not a file`), process.exit(1);
 
   function doDecrypt(password) {
     const decryptor = new EAESDecryptor(password);
@@ -151,11 +164,11 @@ commander
 
 function main(argv) {
   if (!argv.includes('-v')) {
-    console.log(`lib-EAES Version ${packageJson.version}`);
-    console.log('=========================================================================================');
-    console.log('\u2022', packageJson.description);
-    console.log('\u2022', `Authors: ${packageJson.authors.join(', ')}`);
-    console.log('=========================================================================================');
+    log(`lib-EAES Version ${packageJson.version}`);
+    log('=========================================================================================');
+    log('\u2022', packageJson.description);
+    log('\u2022', `Authors: ${packageJson.authors.join(', ')}`);
+    log('=========================================================================================');
     if (!argv.slice(2).filter(v => v !== '-').length) commander.outputHelp();
   }
   commander.parse(argv);
