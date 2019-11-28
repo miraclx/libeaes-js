@@ -98,6 +98,7 @@ function wrapOutFile(outfile) {
       outFileStream.write(v, e, c);
     },
   });
+  process.stdout.on('error', er => streamWrapper.emit('error', er));
   streamWrapper.outfile = outfile;
   streamWrapper.coreFileStream = outFileStream;
   return streamWrapper;
@@ -124,7 +125,7 @@ function processEncrypt(infile, outfile, args) {
           .on('error:encryptor', wrapError(bar, outfile, 'An error occurred while encrypting'))
           .on('error:compressor', wrapError(bar, outfile, 'An error occurred while compressing')),
       )
-      .pipe(outfileStream)
+      .pipe(outfileStream.on('error', wrapError(bar, outfile, 'An error occurred while processing output')))
       .on('finish', getFinalListener('Encryption Complete!', infile, outfileStream, bar));
   }
 
@@ -154,7 +155,7 @@ function processDecrypt(infile, outfile, args) {
           .on('error:decryptor', wrapError(bar, outfile, 'An error occurred while decrypting'))
           .on('error:decompressor', wrapError(bar, outfile, 'An error occurred while decompressing')),
       )
-      .pipe(outfileStream)
+      .pipe(outfileStream.on('error', wrapError(bar, outfile, 'An error occurred while processing output')))
       .on('finish', getFinalListener('Decryption Complete!', infile, outfileStream, bar));
   }
 
