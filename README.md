@@ -102,7 +102,6 @@ libeaes.encryptFileStream("rawfile.txt", "encryptedfile.txt", "#P@$$W0R9");
 libeaes.decryptFileStream("encryptedfile.txt", "decryptedfile.txt", "#P@$$W0R9");
 ```
 
-
 ## API
 
 ### libeaes.encrypt(data, key)
@@ -130,7 +129,6 @@ Decrypt + Decompress the input data, return the processed data
 Encrypt the input data, return the processed data.
 
 Input data is encrypted without initial compression.
-
 
 ### libeaes.rawdecrypt(data, key) *_Excluding decompression_
 
@@ -181,7 +179,6 @@ The stream is not closed when the `'error:encryptor'` event is emitted.
 The `'error:compressor'` event is emitted if an error occurred while encrypting raw data. The listener callback is passed a single `Error` argument when called.
 
 The stream is not closed when the `'error:compressor'` event is emitted.
-
 
 ### Class: EAESDecryptor(key[, opts]) <sub>extends</sub> [`zlib.Gunzip`][gunzip]
 
@@ -248,7 +245,7 @@ Returns the `outputfile`'s stream object.
 ## ClI Info
 
 * When using pipes, it's not possible to seek through the stream
-* To avoid the terminal being cluttered while using pipes, direct other chained binaries (`stdout`, `stderr`) to `/dev/null`
+* To avoid the terminal being cluttered while using pipes, direct other chained binaries' `stdout` and `stderr` to `/dev/null`
 
 ``` bash
 # Watching from an encrypted movie, hiding vlc's log information
