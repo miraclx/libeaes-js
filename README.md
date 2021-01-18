@@ -4,6 +4,7 @@
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmiraclx%2Flibeaes-js.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmiraclx%2Flibeaes-js?ref=badge_shield)
 
 [![NPM][npm-image-url]][npm-url]
 
@@ -304,3 +305,6 @@ npm test
 [gunzip]: https://nodejs.org/api/zlib.html#zlib_class_zlib_gunzip
 [error]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error
 [object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fmiraclx%2Flibeaes-js.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fmiraclx%2Flibeaes-js?ref=badge_large)
